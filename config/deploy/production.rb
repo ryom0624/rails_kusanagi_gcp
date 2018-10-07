@@ -5,6 +5,6 @@ server "35.221.82.154",
     port: "40239",
     keys: %w(/home/user_name/.ssh/id_rsa),
     forward_agent: true,
-    auth_methods: %w(publickey password)
+    auth_methods: %w(publickey)
     # password: "please use keys"
   }
