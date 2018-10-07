@@ -1,4 +1,4 @@
-server 35.221.82.154,
+server "35.221.82.154",
   user: "kusanagi",
   roles: %w{web app},
   ssh_options: {
