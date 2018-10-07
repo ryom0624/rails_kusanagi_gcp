@@ -4,7 +4,7 @@ lock "~> 3.11.0"
 set :application, "rails.com"
 set :repo_url, "git@github.com:ryom0624/rails_kusanagi_gcp"
 set :deploy_to, '/home/kusanagi/rails.com'
-set :linked_files, fetch(:linked_files, []).push(".env", "config/master.key")
+set :linked_files, fetch(:linked_files, []).push("config/master.key")
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
