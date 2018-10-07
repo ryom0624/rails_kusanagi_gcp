@@ -8,54 +8,52 @@ jobs:
     docker:
       # specify the version you desire here
        - image: circleci/ruby:2.4.2-node-browsers
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+    working_directory: /home/circleci/sleepdays
     steps:
       - checkout
 
-      # Download and cache dependencies
+      - setup_remote_docker:
+          reusable: true
+
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            - v1-dependencies-
 
       - run:
           name: install dependencies
           command: |
-            bundle install --jobs=4 --retry=3 --path vendor/bundle
+            bundle install --jobs=4 --retry=3 --clean
+          #command: bundle check || bundle install --jobs=4 --retry=3
 
       - save_cache:
           paths:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
-      # Database setup
-      - run: bundle exec rake db:create
-      - run: bundle exec rake db:schema:load
-
-      # run tests!
+      #production
+      - add_ssh_keys:
+          fingerprints:
+            - "10:34:02:a2:26:d6:65:95:6e:fd:73:39:0c:a7:71:2a"
       - run:
-          name: run tests
+          name: Start ssh-agent
           command: |
-            mkdir /tmp/test-results
-            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
+            ssh-agent -s > ~/.ssh_agent_conf
+            source ~/.ssh_agent_conf
+            for _k in $(ls ${HOME}/.ssh/id_*); do
+              ssh-add ${_k} || true
+            done
 
-            bundle exec rspec --format progress \
-                            --format RspecJunitFormatter \
-                            --out /tmp/test-results/rspec.xml \
-                            --format progress \
-                            $TEST_FILES
 
-      # collect reports
-      - store_test_results:
-          path: /tmp/test-results
-      - store_artifacts:
-          path: /tmp/test-results
-          destination: test-results
+      - deploy:
+          name: Start deploy
+          command: |
+            # if [ "${CIRCLE_BRANCH}" == "development" ]; then
+            #     ssh-keyscan -p ${PORT_NUMBER} ${TESTING_HOST_NAME} >> ~/.ssh/known_hosts
+            #     bundle exec cap staging deploy
+            # fi
+
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                ssh-keyscan -p ${PORT_NUMBER} ${PRODUCTION_HOST_NAME} >> ~/.ssh/known_hosts
+                bundle exec cap production deploy
+            fi
