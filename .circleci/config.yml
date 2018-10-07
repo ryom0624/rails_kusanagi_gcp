@@ -55,5 +55,6 @@ jobs:
 
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
                 ssh-keyscan -p ${PORT_NUMBER} ${PRODUCTION_HOST_NAME} >> ~/.ssh/known_hosts
-                bundle exec cap production deploy
+                ls
+                # bundle exec cap production deploy
             fi
