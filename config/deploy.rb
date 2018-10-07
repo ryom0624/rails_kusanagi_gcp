@@ -2,7 +2,7 @@
 lock "~> 3.11.0"
 
 set :application, "rails.com"
-set :repo_url, "git@github.com/ryom0624/rails_kusanagi_gcp.git"
+set :repo_url, "git@github.com:ryom0624/rails_kusanagi_gcp"
 set :deploy_to, '/home/kusanagi/rails.com'
 
 # Default branch is :master
