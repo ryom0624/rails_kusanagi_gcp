@@ -3,7 +3,6 @@ server "35.221.82.154",
   roles: %w{web app},
   ssh_options: {
     port: "40239",
-    keys: %w(/home/user_name/.ssh/id_rsa),
     forward_agent: true,
     auth_methods: %w(publickey)
     # password: "please use keys"
